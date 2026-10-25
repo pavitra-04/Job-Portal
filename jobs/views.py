@@ -4,12 +4,32 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.shortcuts import redirect
 from .forms import JobForm
-
+from django.shortcuts import get_object_or_404
+from django.views.decorators.http import require_POST
+from .models import Application
 # Create your views here.
-
+    
 def job_list(request):
-    jobs = Job.objects.filter(is_active=True)
-    return render(request, "jobs/job_list.html", {"jobs": jobs})
+    jobs = Job.objects.filter(is_active=True).order_by("-created_at")
+
+    applied_job_ids = set()
+
+    if request.user.is_authenticated and request.user.role == "candidate":
+        applied_job_ids = set(
+            Application.objects.filter(
+                candidate=request.user
+            ).values_list("job_id", flat=True)
+        )
+
+    return render(
+        request,
+        "jobs/job_list.html",
+        {
+            "jobs": jobs,
+            "applied_job_ids": applied_job_ids,
+        },
+    )
+
 
 
 @login_required
@@ -30,3 +50,26 @@ def create_job(request):
         form = JobForm()
 
     return render(request, "jobs/job_form.html", {"form": form})
+
+
+@login_required
+@require_POST
+def apply_for_job(request, job_id):
+    if request.user.role != "candidate":
+        messages.error(request, "Only candidates can apply for jobs.")
+        return redirect("job_list")
+
+    job = get_object_or_404(Job, id=job_id, is_active=True)
+
+    application, created = Application.objects.get_or_create(
+        candidate=request.user,
+        job=job,
+    )
+
+    if created:
+        messages.success(request, "Application submitted successfully.")
+    else:
+        messages.info(request, "You have already applied for this job.")
+
+    return redirect("job_list")
+

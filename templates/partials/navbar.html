@@ -1,0 +1,21 @@
+
+<nav>
+    <a href="{% url 'job_list' %}">Job Portal</a>
+
+    {% if user.is_authenticated %}
+        <span>Hello, {{ user.username }}</span>
+
+        {% if user.role == "employer" %}
+            <a href="{% url 'create_job' %}">Post a Job</a>
+        {% endif %}
+
+        <form method="post" action="{% url 'logout' %}" style="display: inline;">
+            {% csrf_token %}
+            <button type="submit">Logout</button>
+        </form>
+    {% else %}
+        <a href="{% url 'login' %}">Login</a>
+        <a href="{% url 'register' %}">Register</a>
+    {% endif %}
+</nav>
+<hr>
