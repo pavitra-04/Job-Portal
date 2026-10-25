@@ -1,0 +1,19 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Post a Job | Job Portal</title>
+</head>
+<body>
+    <h1>Post a Job</h1>
+
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Create Job</button>
+    </form>
+
+    <p><a href="{% url 'job_list' %}">Back to jobs</a></p>
+</body>
+</html>
