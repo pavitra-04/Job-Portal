@@ -1,19 +1,52 @@
 
 {% include "partials/navbar.html" %}
 
-<h1>My Applications</h1>
+<main class="container">
+    <header class="page-heading">
+        <h1>My Applications</h1>
+        <p class="muted">Track the progress of your job applications.</p>
+    </header>
 
-{% if applications %}
-    {% for application in applications %}
-        <div>
-            <h2>{{ application.job.title }}</h2>
-            <p>Company: {{ application.job.company }}</p>
-            <p>Location: {{ application.job.location }}</p>
-            <p>Applied on: {{ application.applied_at }}</p>
-            <p>Status: {{ application.get_status_display }}</p>
+    {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+                <div class="alert">{{ message }}</div>
+            {% endfor %}
         </div>
-        <hr>
-    {% endfor %}
-{% else %}
-    <p>You haven't applied for any jobs yet.</p>
-{% endif %}
+    {% endif %}
+
+    {% if applications %}
+        <section class="job-list">
+            {% for application in applications %}
+                <article class="job-card">
+                    <h2>{{ application.job.title }}</h2>
+                    <p><strong>{{ application.job.company }}</strong></p>
+                    <p class="job-meta">
+                        {{ application.job.location }}
+                        · {{ application.job.get_job_type_display }}
+                    </p>
+                    <p>Applied on: {{ application.applied_at|date:"d M Y" }}</p>
+
+                    <p>
+                        Status:
+                        <span class="status status-{{ application.status }}">
+                            {{ application.get_status_display }}
+                        </span>
+                    </p>
+
+                    <a class="btn btn-secondary"
+                       href="{% url 'job_detail' application.job.id %}">
+                        View Job
+                    </a>
+                </article>
+            {% endfor %}
+        </section>
+    {% else %}
+        <div class="panel">
+            <h2>No applications yet</h2>
+            <p class="muted">Explore available jobs and submit your first application.</p>
+            <a class="btn" href="{% url 'job_list' %}">Browse Jobs</a>
+        </div>
+    {% endif %}
+</main>
+

@@ -1,33 +1,33 @@
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Available Jobs | Job Portal</title>
-</head>
 
-<body>
-    {% include "partials/navbar.html" %}
+{% include "partials/navbar.html" %}
+
+<main class="container">
+    <header class="page-heading">
+        <h1>Find your next opportunity.</h1>
+        <p class="muted">Explore jobs and find the right fit for you.</p>
+    </header>
+
     {% if messages %}
-        {% for message in messages %}
-            <p>{{ message }}</p>
-        {% endfor %}
+        <div class="messages">
+            {% for message in messages %}
+                <div class="alert">{{ message }}</div>
+            {% endfor %}
+        </div>
     {% endif %}
-    <h1>Available Jobs</h1>
-    
-    <form method="get" action="{% url 'job_list' %}">
+
+    <form method="get" action="{% url 'job_list' %}" class="filter-form">
         <input
             type="text"
             name="q"
-            placeholder="Search by job title or company"
+            placeholder="Job title or company"
             value="{{ search_query }}"
         >
 
         <input
             type="text"
             name="location"
-            placeholder="Filter by location"
+            placeholder="Location"
             value="{{ location_query }}"
         >
 
@@ -41,53 +41,78 @@
             {% endfor %}
         </select>
 
-        <button type="submit">Search & Filter</button>
+        <button type="submit">Search</button>
 
         {% if search_query or location_query or selected_job_type %}
-            <a href="{% url 'job_list' %}">Clear Filters</a>
+            <a href="{% url 'job_list' %}">Clear filters</a>
         {% endif %}
     </form>
 
-    {% for job in jobs %}
-        <article>
-            <h2>{{ job.title }}</h2>
-            <a href="{% url 'job_detail' job.id %}">View Details</a>
+    <div class="page-heading">
+        <h2>Latest opportunities</h2>
+        <p class="muted">{{ jobs|length }} job{{ jobs|length|pluralize }} found</p>
+    </div>
 
-            {% if user.is_authenticated and user.role == "employer" and job.employer_id == user.id %}
-                <a href="{% url 'edit_job' job.id %}">Edit Job</a>
-                <form method="post"
-                        action="{% url 'delete_job' job.id %}"
-                        onsubmit="return confirm('Are you sure you want to delete this job?');">
-                    {% csrf_token %}
-                    <button type="submit">Delete Job</button>
-                </form>
-            {% endif %}
+    {% if jobs %}
+        <section class="job-list">
+            {% for job in jobs %}
+                <article class="job-card">
+                    <h2>{{ job.title }}</h2>
+                    <p><strong>{{ job.company }}</strong></p>
 
-            <p>{{ job.company }} · {{ job.location }}</p>
-            <p>Job type: {{ job.get_job_type_display }}</p>
-            <p>{{ job.description }}</p>
+                    <p class="job-meta">
+                        {{ job.location }} · {{ job.get_job_type_display }}
+                    </p>
 
-            {% if job.salary %}
-                <p>Salary: {{ job.salary }}</p>
-            {% else %}
-                <p>Salary not specified</p>
-            {% endif %}
+                    {% if job.salary %}
+                        <p><strong>Salary:</strong> {{ job.salary }}</p>
+                    {% endif %}
 
-            {% if user.is_authenticated and user.role == "candidate" %}
-                {% if job.id in applied_job_ids %}
-                    <button type="button" disabled>Already Applied</button>
-                {% else %}
-                    <form method="post" action="{% url 'apply_for_job' job.id %}">
-                        {% csrf_token %}
-                        <button type="submit">Apply Now</button>
-                    </form>
-                {% endif %}
-            {% endif %}
-        </article>
-        <hr>
-    {% empty %}
-        <p>No jobs are available right now.</p>
-    {% endfor %}
-</body>
+                    <p>
+                        {{ job.description|truncatewords:25 }}
+                    </p>
 
-</html>
+                    <div class="job-actions">
+                        <a class="btn btn-secondary"
+                           href="{% url 'job_detail' job.id %}">
+                            View Details
+                        </a>
+
+                        {% if user.is_authenticated and user.role == "candidate" %}
+                            {% if job.id in applied_job_ids %}
+                                <button type="button" disabled>Already Applied</button>
+                            {% else %}
+                                <form method="post"
+                                      action="{% url 'apply_for_job' job.id %}">
+                                    {% csrf_token %}
+                                    <button type="submit">Apply Now</button>
+                                </form>
+                            {% endif %}
+                        {% endif %}
+
+                        {% if user.is_authenticated and user.role == "employer" and job.employer_id == user.id %}
+                            <a class="btn btn-secondary"
+                               href="{% url 'edit_job' job.id %}">
+                                Edit
+                            </a>
+
+                            <form method="post"
+                                  action="{% url 'delete_job' job.id %}"
+                                  onsubmit="return confirm('Are you sure you want to delete this job?');">
+                                {% csrf_token %}
+                                <button class="btn-danger" type="submit">
+                                    Delete
+                                </button>
+                            </form>
+                        {% endif %}
+                    </div>
+                </article>
+            {% endfor %}
+        </section>
+    {% else %}
+        <div class="panel">
+            <h3>No jobs found</h3>
+            <p class="muted">Try a different search term or remove some filters.</p>
+        </div>
+    {% endif %}
+</main>

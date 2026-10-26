@@ -1,20 +1,36 @@
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Post a Job | Job Portal</title>
-</head>
-<body>
-    {% include "partials/navbar.html" %}
-    <h1>Post a Job</h1>
+{% include "partials/navbar.html" %}
 
-    <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">Create Job</button>
-    </form>
+<main class="container">
+    <section class="panel form-panel">
+        <h1>{% if job %}Edit Job{% else %}Post a Job{% endif %}</h1>
+        <p class="muted">
+            {% if job %}
+                Update the details of your job posting.
+            {% else %}
+                Share an opportunity with candidates.
+            {% endif %}
+        </p>
 
-    <p><a href="{% url 'job_list' %}">Back to jobs</a></p>
-</body>
-</html>
+        {% if messages %}
+            <div class="messages">
+                {% for message in messages %}
+                    <div class="alert">{{ message }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+
+            <button type="submit">
+                {% if job %}Save Changes{% else %}Publish Job{% endif %}
+            </button>
+
+            <a class="btn btn-secondary" href="{% url 'job_list' %}">
+                Cancel
+            </a>
+        </form>
+    </section>
+</main>

@@ -1,5 +1,6 @@
-
-<nav>
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/style.css' %}">
+<nav class="navbar">
     <a href="{% url 'job_list' %}">Job Portal</a>
 
     {% if user.is_authenticated %}
