@@ -51,6 +51,7 @@
     {% for job in jobs %}
         <article>
             <h2>{{ job.title }}</h2>
+            <a href="{% url 'job_detail' job.id %}">View Details</a>
             <p>{{ job.company }} · {{ job.location }}</p>
             <p>Job type: {{ job.get_job_type_display }}</p>
             <p>{{ job.description }}</p>

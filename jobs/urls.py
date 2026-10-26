@@ -15,5 +15,6 @@ urlpatterns = [
     "employer/applications/<int:application_id>/status/",
     views.update_application_status,
     name="update_application_status",
-),
+    ),
+    path("jobs/<int:job_id>/detail/", views.job_detail, name="job_detail"),
 ]

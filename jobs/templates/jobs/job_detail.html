@@ -1,0 +1,38 @@
+
+{% include "partials/navbar.html" %}
+
+<h1>{{ job.title }}</h1>
+
+<p><strong>Company:</strong> {{ job.company }}</p>
+<p><strong>Location:</strong> {{ job.location }}</p>
+<p><strong>Job Type:</strong> {{ job.get_job_type_display }}</p>
+
+{% if job.salary %}
+    <p><strong>Salary:</strong> {{ job.salary }}</p>
+{% endif %}
+
+<h2>Job Description</h2>
+<p>{{ job.description|linebreaks }}</p>
+
+{% if messages %}
+    {% for message in messages %}
+        <p>{{ message }}</p>
+    {% endfor %}
+{% endif %}
+
+{% if user.is_authenticated and user.role == "candidate" %}
+    {% if has_applied %}
+        <button type="button" disabled>Already Applied</button>
+    {% else %}
+        <form method="post" action="{% url 'apply_for_job' job.id %}">
+            {% csrf_token %}
+            <button type="submit">Apply Now</button>
+        </form>
+    {% endif %}
+{% elif not user.is_authenticated %}
+    <p>
+        <a href="{% url 'login' %}">Log in</a> as a candidate to apply.
+    </p>
+{% endif %}
+
+<p><a href="{% url 'job_list' %}">Back to Jobs</a></p>

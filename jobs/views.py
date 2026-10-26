@@ -214,3 +214,24 @@ def update_application_status(request, application_id):
         messages.error(request, "Invalid application status.")
 
     return redirect("employer_applications")
+
+
+def job_detail(request, job_id):
+    job = get_object_or_404(Job, id=job_id, is_active=True)
+
+    has_applied = False
+
+    if request.user.is_authenticated and request.user.role == "candidate":
+        has_applied = Application.objects.filter(
+            candidate=request.user,
+            job=job,
+        ).exists()
+
+    return render(
+        request,
+        "jobs/job_detail.html",
+        {
+            "job": job,
+            "has_applied": has_applied,
+        },
+    )
