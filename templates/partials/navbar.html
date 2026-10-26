@@ -17,5 +17,8 @@
         <a href="{% url 'login' %}">Login</a>
         <a href="{% url 'register' %}">Register</a>
     {% endif %}
+    {% if user.role == "candidate" %}
+        <a href="{% url 'my_applications' %}">My Applications</a>
+    {% endif %}
 </nav>
 <hr>

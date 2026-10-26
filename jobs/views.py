@@ -73,3 +73,38 @@ def apply_for_job(request, job_id):
 
     return redirect("job_list")
 
+
+@login_required
+def employer_applications(request):
+    if request.user.role != "employer":
+        messages.error(request, "Only employers can view applicants.")
+        return redirect("job_list")
+
+    applications = Application.objects.filter(
+        job__employer=request.user
+    ).select_related("candidate", "job").order_by("-applied_at")
+
+    return render(
+        request,
+        "jobs/employer_applications.html",
+        {"applications": applications},
+    )
+
+@login_required
+def my_applications(request):
+    if request.user.role != "candidate":
+        messages.error(request, "Only candidates can view their applications.")
+        return redirect("job_list")
+
+    applications = (
+        Application.objects
+        .filter(candidate=request.user)
+        .select_related("job")
+        .order_by("-applied_at")
+    )
+
+    return render(
+        request,
+        "jobs/my_applications.html",
+        {"applications": applications},
+    )

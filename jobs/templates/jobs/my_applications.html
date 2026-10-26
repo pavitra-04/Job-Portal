@@ -1,0 +1,19 @@
+
+{% include "partials/navbar.html" %}
+
+<h1>My Applications</h1>
+
+{% if applications %}
+    {% for application in applications %}
+        <div>
+            <h2>{{ application.job.title }}</h2>
+            <p>Company: {{ application.job.company }}</p>
+            <p>Location: {{ application.job.location }}</p>
+            <p>Applied on: {{ application.applied_at }}</p>
+            <p>Status: {{ application.get_status_display }}</p>
+        </div>
+        <hr>
+    {% endfor %}
+{% else %}
+    <p>You haven't applied for any jobs yet.</p>
+{% endif %}

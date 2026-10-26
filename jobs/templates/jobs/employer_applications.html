@@ -1,0 +1,27 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Applicants | Job Portal</title>
+</head>
+<body>
+    {% include "partials/navbar.html" %}
+
+    <h1>Applications for Your Jobs</h1>
+
+    {% for application in applications %}
+        <article>
+            <h2>{{ application.job.title }}</h2>
+            <p>Candidate: {{ application.candidate.username }}</p>
+            <p>Email: {{ application.candidate.email }}</p>
+            <p>Applied: {{ application.applied_at }}</p>
+            <p>Status: {{ application.get_status_display }}</p>
+        </article>
+        <hr>
+    {% empty %}
+        <p>No applications received yet.</p>
+    {% endfor %}
+</body>
+</html>
