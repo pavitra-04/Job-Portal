@@ -108,3 +108,29 @@ def my_applications(request):
         "jobs/my_applications.html",
         {"applications": applications},
     )
+
+
+@login_required
+@require_POST
+def update_application_status(request, application_id):
+    if request.user.role != "employer":
+        messages.error(request, "Only employers can update application statuses.")
+        return redirect("job_list")
+
+    application = get_object_or_404(
+        Application,
+        id=application_id,
+        job__employer=request.user,
+    )
+
+    status = request.POST.get("status")
+    valid_statuses = Application.Status.values
+
+    if status in valid_statuses:
+        application.status = status
+        application.save(update_fields=["status"])
+        messages.success(request, "Application status updated.")
+    else:
+        messages.error(request, "Invalid application status.")
+
+    return redirect("employer_applications")
