@@ -30,6 +30,21 @@ A web-based job portal built using Django that connects job seekers with employe
 - **Database:** SQLite
 - **Testing:** Django TestCase
 
+## Screenshots
+
+### Homepage
+![Job Portal Homepage](screenshots/homepage.png)
+
+### Job Details
+![Job Details Page](screenshots/job-details.png)
+
+### My Applications
+![Candidate Applications Dashboard](screenshots/my-applications.png)
+
+### Employer Dashboard
+![Employer Applications Dashboard](screenshots/employer-dashboard.png)
+
+
 ## Getting Started
 
 ### Prerequisites
