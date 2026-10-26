@@ -17,4 +17,14 @@ urlpatterns = [
     name="update_application_status",
     ),
     path("jobs/<int:job_id>/detail/", views.job_detail, name="job_detail"),
+    path(
+    "jobs/<int:job_id>/edit/",
+    views.edit_job,
+    name="edit_job",
+    ),
+    path(
+    "jobs/<int:job_id>/delete/",
+    views.delete_job,
+    name="delete_job",
+    ),
 ]

@@ -235,3 +235,49 @@ def job_detail(request, job_id):
             "has_applied": has_applied,
         },
     )
+
+
+@login_required
+def edit_job(request, job_id):
+    if request.user.role != "employer":
+        messages.error(request, "Only employers can edit jobs.")
+        return redirect("job_list")
+
+    job = get_object_or_404(
+        Job,
+        id=job_id,
+        employer=request.user,
+    )
+
+    if request.method == "POST":
+        form = JobForm(request.POST, instance=job)
+
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Job updated successfully.")
+            return redirect("job_list")
+    else:
+        form = JobForm(instance=job)
+
+    return render(
+        request,
+        "jobs/job_form.html",
+        {"form": form, "job": job},
+    )
+
+@login_required
+@require_POST
+def delete_job(request, job_id):
+    if request.user.role != "employer":
+        messages.error(request, "Only employers can delete jobs.")
+        return redirect("job_list")
+
+    job = get_object_or_404(
+        Job,
+        id=job_id,
+        employer=request.user,
+    )
+
+    job.delete()
+    messages.success(request, "Job deleted successfully.")
+    return redirect("job_list")
