@@ -7,9 +7,89 @@ from .forms import JobForm
 from django.shortcuts import get_object_or_404
 from django.views.decorators.http import require_POST
 from .models import Application
+from django.db import models
 # Create your views here.
     
+
+
 def job_list(request):
+    jobs = Job.objects.filter(is_active=True).order_by("-created_at")
+
+    search_query = request.GET.get("q", "").strip()
+    location_query = request.GET.get("location", "").strip()
+    job_type = request.GET.get("job_type", "").strip()
+
+    if search_query:
+        jobs = jobs.filter(
+            models.Q(title__icontains=search_query)
+            | models.Q(company__icontains=search_query)
+        )
+
+    if location_query:
+        jobs = jobs.filter(location__icontains=location_query)
+
+    valid_job_types = Job.JobType.values
+    if job_type in valid_job_types:
+        jobs = jobs.filter(job_type=job_type)
+    else:
+        job_type = ""
+
+    applied_job_ids = set()
+
+    if request.user.is_authenticated and request.user.role == "candidate":
+        applied_job_ids = set(
+            Application.objects.filter(candidate=request.user)
+            .values_list("job_id", flat=True)
+        )
+
+    return render(
+        request,
+        "jobs/job_list.html",
+        {
+            "jobs": jobs,
+            "applied_job_ids": applied_job_ids,
+            "search_query": search_query,
+            "location_query": location_query,
+            "selected_job_type": job_type,
+            "job_types": Job.JobType.choices,
+        },
+    )
+
+    jobs = Job.objects.filter(is_active=True).order_by("-created_at")
+
+    search_query = request.GET.get("q", "").strip()
+    location_query = request.GET.get("location", "").strip()
+    job_type = request.GET.get("job_type", "").strip()
+    if search_query:
+        jobs = jobs.filter(
+            models.Q(title__icontains=search_query)
+            | models.Q(company__icontains=search_query)
+        )
+
+    if location_query:
+        jobs = jobs.filter(location__icontains=location_query)
+
+    if job_type:
+        jobs = jobs.filter(job_type=job_type)
+
+    applied_job_ids = set()
+
+    if request.user.is_authenticated and request.user.role == "candidate":
+        applied_job_ids = set(
+            Application.objects.filter(candidate=request.user)
+            .values_list("job_id", flat=True)
+        )
+
+    return render(
+        request,
+        "jobs/job_list.html",
+        {
+            "jobs": jobs,
+            "applied_job_ids": applied_job_ids,
+            "search_query": search_query,
+        },
+    )
+
     jobs = Job.objects.filter(is_active=True).order_by("-created_at")
 
     applied_job_ids = set()
